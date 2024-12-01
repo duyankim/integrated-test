@@ -1,0 +1,51 @@
+scenario_name: "출금이체통보_대량처리_테스트"
+batch_id: "EB34"
+dependencies:
+  - "EB35"
+
+preparation:
+  <<: *file_and_db_prep
+  input_file:
+    records:
+      - type: "header"
+        template:
+          date: "TODAY"
+          total_count: "{{sum_of_data_set_counts}}"
+      
+      - type: "data"
+        from_test_data: true  # test_data의 data_sets을 사용하여 파일 레코드 생성
+      
+      - type: "trailer"
+        template:
+          total_amount: "{{sum_of_all_amounts}}"
+
+test_data:
+  header:
+    date: "TODAY"
+    total_count: "{{sum_of_data_set_counts}}"
+  
+  data_sets:
+    - <<: *normal_case
+      count: 1000
+      template:
+        <<: *normal_template
+        save_as: "EB34_account_{{index}}"
+    
+    - <<: *minimum_amount_case
+      count: 5
+      template:
+        save_as: "EB34_minimum_amount_{{index}}"
+    
+    - <<: *invalid_account_case
+      count: 5
+      template:
+        save_as: "EB34_invalid_{{index}}"
+
+validations:
+  <<: *common_validations
+  file_checks:
+    output_file:
+      total_size: "{{expected_file_size}}"
+      record_counts:
+        success: 1000
+        fail: 100

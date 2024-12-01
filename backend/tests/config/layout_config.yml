@@ -1,0 +1,24 @@
+layout_settings:
+  source_table: "COM_TLG_LAYT_D"
+  cache_enabled: true
+  validate_structure: true
+  required_fields: ["FIELD_NM", "FIELD_LEN", "FIELD_TYPE"]
+
+common_preparation:
+  - action: "load_layout"
+    target: "file_layout"
+    params:
+      table: "COM_TLG_LAYT_D"
+      cache_key: "{{batch_id}}"
+      conditions:
+        tlg_layt_id: 
+          like: "%{{batch_id}}%"
+
+validation_rules:
+  layout_validation:
+    enabled: true
+    strict_mode: true
+    check_fields:
+      - field_length
+      - field_type
+      - required_values 

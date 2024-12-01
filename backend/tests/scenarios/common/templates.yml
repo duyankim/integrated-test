@@ -1,0 +1,39 @@
+# 공통으로 사용할 테스트 케이스 템플릿
+common_test_cases: &common_test_cases
+  - &normal_case
+    name: "정상처리_케이스"
+    template: &normal_template
+      account: "{{random_account(10)}}"
+      amount: "{{random_range(1, 50000, 10000)}}"
+      status: "READY"
+      resp_code: "0000"
+  
+  - &minimum_amount_case
+    name: "출금금액미달_케이스"
+    template:
+      account: "{{random_account(10)}}"
+      amount: 0
+      status: "READY"
+      resp_code: "E001"
+  
+  - &invalid_account_case
+    name: "잘못된_계좌번호_케이스"
+    template:
+      account: "{{random_invalid_account()}}"
+      amount: "{{random_range(1000, 50000, 1000)}}"
+      status: "READY"
+      resp_code: "E002"
+
+# 공통 검증 룰
+common_validations: &common_validations
+  db_checks:
+    - table: "CMS_SND_RCV_FILE_L"
+      conditions:
+        success_case:
+          status: "SUCCESS"
+          resp_code: "0000"
+        fail_cases:
+          - error_type: "minimum_amount"
+            resp_code: "E001"
+          - error_type: "invalid_account"
+            resp_code: "E002" 

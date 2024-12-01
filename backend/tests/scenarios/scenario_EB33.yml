@@ -1,0 +1,39 @@
+scenario_name: "출금이체지시_대량처리_테스트"
+batch_id: "EB33"
+dependencies:
+  - "BATCH000"
+
+test_data_settings:
+  clear_before_test: true
+  save_results: true
+  parallel_processing: true
+  max_parallel_count: 100
+
+test_data:
+  header:
+    date: "TODAY"
+    total_count: "{{sum_of_data_set_counts}}"
+  
+  data_sets:
+    - <<: *normal_case
+      count: 1000
+      template:
+        <<: *normal_template
+        save_as: "EB33_account_{{index}}"
+    
+    - <<: *minimum_amount_case
+      count: 5
+      template:
+        save_as: "EB33_minimum_amount_{{index}}"
+    
+    - <<: *invalid_account_case
+      count: 5
+      template:
+        save_as: "EB33_invalid_{{index}}"
+
+  trailer:
+    total_amount: "{{sum_of_all_amounts}}"
+
+validations:
+  <<: *common_validations
+  # 시나리오별 특수한 검증 규칙이 있다면 여기에 추가
